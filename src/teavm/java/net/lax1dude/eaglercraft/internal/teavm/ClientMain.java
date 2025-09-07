@@ -34,6 +34,7 @@ import net.lax1dude.eaglercraft.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.internal.teavm.opts.JSEaglercraftXOptsAssetsURI;
 import net.lax1dude.eaglercraft.internal.teavm.opts.JSEaglercraftXOptsRoot;
 import com.mojang.minecraft.Minecraft;
+import com.mojang.minecraft.User;
 
 import net.lax1dude.eaglercraft.internal.ContextLostError;
 
@@ -211,6 +212,7 @@ public class ClientMain {
 			systemOut.println("ClientMain: [INFO] launching eaglercraftx main thread");
 
 			try {
+				JSEaglercraftXOptsRoot eaglercraftOpts = (JSEaglercraftXOptsRoot)opts;
 				Minecraft minecraft = new Minecraft(854, 480, false);
 				String username = eaglercraftOpts.getString("username");
 				if (username != null && !username.isEmpty()) {
