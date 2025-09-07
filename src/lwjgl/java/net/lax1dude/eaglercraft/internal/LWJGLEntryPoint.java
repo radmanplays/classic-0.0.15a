@@ -10,6 +10,8 @@ import com.mojang.minecraft.User;
 
 import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.EagUtils;
+import net.lax1dude.eaglercraft.socket.AddressResolver;
+import net.lax1dude.eaglercraft.socket.AddressResolver.ServerInfo;
 
 /**
  * Copyright (c) 2022-2023 lax1dude. All Rights Reserved.
@@ -65,26 +67,13 @@ public class LWJGLEntryPoint {
 		EagRuntime.create();
 
 		Minecraft minecraft = new Minecraft(854, 480, false);
-		
-		String host = null;
-		Integer port = null;
+
+		ServerInfo serverInfo = null;
 		String username = null;
 
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equalsIgnoreCase("--server") && i + 1 < args.length) {
-				String[] parts = args[i + 1].split(":");
-				if (parts.length == 2) {
-					host = parts[0];
-					try {
-						port = Integer.parseInt(parts[1]);
-					} catch (NumberFormatException e) {
-						System.err.println("Invalid port in server argument, ignoring.");
-						host = null;
-						port = null;
-					}
-				} else {
-					System.err.println("Invalid server format, expected IP:PORT");
-				}
+				serverInfo = AddressResolver.resolveURI(args[i + 1]);
 			} else if (args[i].equalsIgnoreCase("--username") && i + 1 < args.length) {
 				username = args[i + 1];
 			}
@@ -94,9 +83,9 @@ public class LWJGLEntryPoint {
 			System.out.println("Using username: " + username);
 		}
 
-		if (host != null && port != null) {
-			minecraft.setServer(host, port);
-			System.out.println("Connecting to server " + host + ":" + port);
+		if (serverInfo.ip != null) {
+			minecraft.setServer(serverInfo.host, serverInfo.port);
+			System.out.println("Connecting to server " + serverInfo.ip);
 		}
 		
 		(new Thread(minecraft)).run();

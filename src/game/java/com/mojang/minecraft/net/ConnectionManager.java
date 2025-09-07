@@ -5,6 +5,7 @@ import com.mojang.minecraft.Minecraft;
 
 import net.lax1dude.eaglercraft.internal.EnumEaglerConnectionState;
 import net.lax1dude.eaglercraft.internal.PlatformNetworking;
+import net.lax1dude.eaglercraft.socket.AddressResolver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public final class ConnectionManager {
 		SocketConnection var5 = this.connection;
 		var5.manager = this;
 		this.minecraft = var1;
-		String address = var2.contains("://") ? var2 + ":" + var3: "ws://" + var2 + ":" + var3;
+		String address = AddressResolver.resolveURI(var2).ip;
 		this.connection.webSocket = PlatformNetworking.openWebSocket(address);
 
 		if (this.connection.webSocket == null) {
