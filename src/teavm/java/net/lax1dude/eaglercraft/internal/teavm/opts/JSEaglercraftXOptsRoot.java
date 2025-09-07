@@ -25,10 +25,10 @@ public abstract class JSEaglercraftXOptsRoot implements JSObject {
 	public native String getContainer();
 
 	@JSBody(params = { "def" }, script = "return (typeof this.username === \"string\") ? this.username : def;")
-	String getUsername(String defaultValue);
+	public native String getUsername(String defaultValue);
 
 	@JSBody(params = { "def" }, script = "return (typeof this.joinServer === \"string\") ? this.joinServer : def;")
-	String getJoinServer(String defaultValue);
+	public native String getJoinServer(String defaultValue);
 
 	@JSBody(script = "return (typeof this.assetsURI === \"string\") ? this.assetsURI : null;")
 	public native String getAssetsURI();
