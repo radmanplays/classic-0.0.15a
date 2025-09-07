@@ -27,8 +27,13 @@ public final class LevelIO {
 	}
 
 	public final Level load(VFile2 var1) {
-		this.minecraft.beginLevelLoading("Loading level");
-		this.minecraft.levelLoadUpdate("Reading..");
+		if(this.minecraft != null) {
+			this.minecraft.beginLevelLoading("Loading level");
+		}
+
+		if(this.minecraft != null) {
+			this.minecraft.levelLoadUpdate("Reading..");
+		}
 
 		try {
 			DataInputStream var10 = new DataInputStream(new GZIPInputStream(var1.getInputStream()));
@@ -72,8 +77,13 @@ public final class LevelIO {
 	}
 
 	public final Level loadLegacy(VFile2 var1) {
-		this.minecraft.beginLevelLoading("Loading level");
-		this.minecraft.levelLoadUpdate("Reading..");
+		if(this.minecraft != null) {
+			this.minecraft.beginLevelLoading("Loading level");
+		}
+
+		if(this.minecraft != null) {
+			this.minecraft.levelLoadUpdate("Reading..");
+		}
 
 		try {
 			DataInputStream var5 = new DataInputStream(new GZIPInputStream(var1.getInputStream()));
@@ -102,6 +112,18 @@ public final class LevelIO {
 			var0.writeTo(var3);
 		} catch (IOException var2) {
 			var2.printStackTrace();
+		}
+	}
+	
+	public static byte[] loadBlocks(InputStream var0) {
+		try {
+			DataInputStream var3 = new DataInputStream(new GZIPInputStream(var0));
+			byte[] var1 = new byte[var3.readInt()];
+			var3.readFully(var1);
+			var3.close();
+			return var1;
+		} catch (Exception var2) {
+			throw new RuntimeException(var2);
 		}
 	}
 }

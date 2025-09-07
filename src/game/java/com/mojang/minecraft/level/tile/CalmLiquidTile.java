@@ -1,10 +1,11 @@
 package com.mojang.minecraft.level.tile;
 
 import com.mojang.minecraft.level.Level;
+import com.mojang.minecraft.level.liquid.Liquid;
 import java.util.Random;
 
 public final class CalmLiquidTile extends LiquidTile {
-	protected CalmLiquidTile(int var1, int var2) {
+	protected CalmLiquidTile(int var1, Liquid var2) {
 		super(var1, var2);
 		this.tileId = var1 - 1;
 		this.calmTileId = var1;
@@ -36,16 +37,18 @@ public final class CalmLiquidTile extends LiquidTile {
 			var6 = true;
 		}
 
-		if(this.liquidType == 1 && var5 == Tile.lava.id) {
-			var1.setTileNoUpdate(var2, var3, var4, Tile.rock.id);
-		} else if(this.liquidType == 2 && var5 == Tile.water.id) {
-			var1.setTileNoUpdate(var2, var3, var4, Tile.rock.id);
-		} else {
-			if(var6) {
-				var1.setTileNoUpdate(var2, var3, var4, this.tileId);
-				var1.addToTickNextTick(var2, var3, var4, this.tileId);
+		if(var5 != 0) {
+			Liquid var7 = Tile.tiles[var5].getLiquidType();
+			if(this.liquid == Liquid.water && var7 == Liquid.lava || var7 == Liquid.water && this.liquid == Liquid.lava) {
+				var1.setTile(var2, var3, var4, Tile.rock.id);
+				return;
 			}
-
 		}
+
+		if(var6) {
+			var1.setTileNoUpdate(var2, var3, var4, this.tileId);
+			var1.addToTickNextTick(var2, var3, var4, this.tileId);
+		}
+
 	}
 }

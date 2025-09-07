@@ -6,6 +6,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.mojang.minecraft.Minecraft;
+import com.mojang.minecraft.User;
 
 import net.lax1dude.eaglercraft.EagRuntime;
 import net.lax1dude.eaglercraft.EagUtils;
@@ -64,6 +65,40 @@ public class LWJGLEntryPoint {
 		EagRuntime.create();
 
 		Minecraft minecraft = new Minecraft(854, 480, false);
+		
+		String host = null;
+		Integer port = null;
+		String username = null;
+
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equalsIgnoreCase("--server") && i + 1 < args.length) {
+				String[] parts = args[i + 1].split(":");
+				if (parts.length == 2) {
+					host = parts[0];
+					try {
+						port = Integer.parseInt(parts[1]);
+					} catch (NumberFormatException e) {
+						System.err.println("Invalid port in server argument, ignoring.");
+						host = null;
+						port = null;
+					}
+				} else {
+					System.err.println("Invalid server format, expected IP:PORT");
+				}
+			} else if (args[i].equalsIgnoreCase("--username") && i + 1 < args.length) {
+				username = args[i + 1];
+			}
+		}
+		if (username != null) {
+			minecraft.user = new User(username, "");
+			System.out.println("Using username: " + username);
+		}
+
+		if (host != null && port != null) {
+			minecraft.setServer(host, port);
+			System.out.println("Connecting to server " + host + ":" + port);
+		}
+		
 		(new Thread(minecraft)).run();
 
 	}

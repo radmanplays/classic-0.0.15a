@@ -1,12 +1,12 @@
 package com.mojang.minecraft.character;
 
 public final class ZombieModel {
-	public Cube head = new Cube(0, 0);
-	public Cube body;
-	public Cube arm0;
-	public Cube arm1;
-	public Cube leg0;
-	public Cube leg1;
+	private Cube head = new Cube(0, 0);
+	private Cube body;
+	private Cube arm0;
+	private Cube arm1;
+	private Cube leg0;
+	private Cube leg1;
 
 	public ZombieModel() {
 		this.head.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8);
@@ -24,5 +24,22 @@ public final class ZombieModel {
 		this.leg1 = new Cube(0, 16);
 		this.leg1.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4);
 		this.leg1.setPos(2.0F, 12.0F, 0.0F);
+	}
+
+	public final void render(float var1, float var2) {
+		this.head.yRot = 0.0F;
+		this.head.xRot = var2 / 57.29578F;
+		this.arm0.xRot = (float)Math.sin((double)var1 * 0.6662D + Math.PI) * 2.0F;
+		this.arm0.zRot = (float)(Math.sin((double)var1 * 0.2312D) + 1.0D);
+		this.arm1.xRot = (float)Math.sin((double)var1 * 0.6662D) * 2.0F;
+		this.arm1.zRot = (float)(Math.sin((double)var1 * 0.2812D) - 1.0D);
+		this.leg0.xRot = (float)Math.sin((double)var1 * 0.6662D) * 1.4F;
+		this.leg1.xRot = (float)Math.sin((double)var1 * 0.6662D + Math.PI) * 1.4F;
+		this.head.render();
+		this.body.render();
+		this.arm0.render();
+		this.arm1.render();
+		this.leg0.render();
+		this.leg1.render();
 	}
 }

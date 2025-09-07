@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
 		<meta name="description" content="Play minecraft 1.8 in your browser" />
 		<meta name="keywords" content="eaglercraft, eaglercraftx, minecraft, 1.8, 1.8.8" />
-		<title>Classic 0.0.14a_8 WASM-GC</title>
+		<title>Classic 0.0.15a WASM-GC</title>
 		<meta property="og:locale" content="en-US" />
 		<meta property="og:type" content="website" />
 		<meta property="og:title" content="EaglercraftX 1.8 WASM-GC" />
@@ -40,12 +40,15 @@
 					
 					// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 					
-					var q = window.location.search;
-					if((typeof q === "string") && q[0] === "?" && (typeof window.URLSearchParams !== "undefined")) {
-						q = new window.URLSearchParams(q);
-						var s = q.get("server");
-						if(s) window.eaglercraftXOpts.joinServer = s;
+					if (typeof window.URLSearchParams !== "undefined") {
+						const params = new URLSearchParams(window.location.search);
+						const server = params.get("server");
+						const username = params.get("username");
+
+						if (server) window.eaglercraftXOpts.joinServer = server;
+						if (username) window.eaglercraftXOpts.username = username;
 					}
+
 					
 					main();
 					

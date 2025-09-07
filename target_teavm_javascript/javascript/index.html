@@ -37,11 +37,13 @@
 						]
 					};
 
-					var q = window.location.search;
-					if((typeof q === "string") && q[0] === "?" && (typeof window.URLSearchParams !== "undefined")) {
-						q = new window.URLSearchParams(q);
-						var s = q.get("server");
-						if(s) window.eaglercraftXOpts.joinServer = s;
+					if (typeof window.URLSearchParams !== "undefined") {
+						const params = new URLSearchParams(window.location.search);
+						const server = params.get("server");
+						const username = params.get("username");
+
+						if (server) window.eaglercraftXOpts.joinServer = server;
+						if (username) window.eaglercraftXOpts.username = username;
 					}
 
 					main();

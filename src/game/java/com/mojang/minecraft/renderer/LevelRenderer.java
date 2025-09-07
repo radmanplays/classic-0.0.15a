@@ -16,10 +16,10 @@ import org.lwjgl.opengl.GL11;
 
 public final class LevelRenderer {
 	public Level level;
-	private Textures textures;
+	public Textures textures;
 	public int surroundLists;
 	public int drawDistance = 0;
-	private IntBuffer dummyBuffer = GLAllocation.createIntBuffer(65536);
+	public IntBuffer dummyBuffer = GLAllocation.createIntBuffer(65536);
 	public Set dirtyChunks = new HashSet();
 	private Chunk[] chunks;
 	public Chunk[] sortedChunks;
@@ -42,8 +42,11 @@ public final class LevelRenderer {
 		}
 
 		this.level = var1;
-		var1.addListener(this);
-		this.compileSurroundingGround();
+		if(var1 != null) {
+			var1.addListener(this);
+			this.compileSurroundingGround();
+		}
+
 	}
 
 	public final void compileSurroundingGround() {
@@ -187,9 +190,7 @@ public final class LevelRenderer {
 
 	}
 
-	public final void render(Player var1, int var2) {
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.textures.loadTexture("/terrain.png", GL11.GL_NEAREST));
+	public final int render(Player var1, int var2) {
 		float var3 = var1.x - this.lX;
 		float var4 = var1.y - this.lY;
 		float var5 = var1.z - this.lZ;
@@ -206,12 +207,15 @@ public final class LevelRenderer {
 			this.chunks[var6].render(this.dummyBuffer, var2);
 		}
 
-		if(this.dummyBuffer.position() > 0) {
-			this.dummyBuffer.flip();
+		this.dummyBuffer.flip();
+		if(this.dummyBuffer.remaining() > 0) {
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.textures.loadTexture("/terrain.png", GL11.GL_NEAREST));
 			GL11.glCallLists(this.dummyBuffer);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 		}
 
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		return this.dummyBuffer.remaining();
 	}
 
 	public final void renderClouds(float var1) {

@@ -83,7 +83,7 @@ public final class Cube {
 		GL11.glPushMatrix();
 		GL11.glTranslatef(this.x, this.y, this.z);
 		GL11.glRotatef(this.zRot * var6, 0.0F, 0.0F, 1.0F);
-		GL11.glRotatef(this.yRot * var6, 0.0F, 1.0F, 0.0F);
+		GL11.glRotatef(0.0F, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(this.xRot * var6, 1.0F, 0.0F, 0.0F);
 		GL11.glCallList(this.list);
 		GL11.glPopMatrix();

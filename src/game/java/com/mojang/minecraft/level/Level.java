@@ -3,6 +3,7 @@ package com.mojang.minecraft.level;
 import com.mojang.minecraft.Entity;
 import com.mojang.minecraft.HitResult;
 import com.mojang.minecraft.character.Vec3;
+import com.mojang.minecraft.level.liquid.Liquid;
 import com.mojang.minecraft.level.tile.Tile;
 import com.mojang.minecraft.phys.AABB;
 import com.mojang.minecraft.renderer.LevelRenderer;
@@ -12,6 +13,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Level implements Serializable {
@@ -19,7 +21,7 @@ public class Level implements Serializable {
 	public int width;
 	public int height;
 	public int depth;
-	byte[] blocks;
+	public byte[] blocks;
 	public String name;
 	public String creator;
 	public long createTime;
@@ -42,6 +44,7 @@ public class Level implements Serializable {
 		} else {
 			this.levelListeners = new ArrayList();
 			this.heightMap = new int[this.width * this.height];
+			Arrays.fill(this.heightMap, this.depth);
 			this.calcLightDepths(0, 0, this.width, this.height);
 			this.random = new Random();
 			this.randValue = this.random.nextInt();
@@ -63,6 +66,7 @@ public class Level implements Serializable {
 		this.depth = var2;
 		this.blocks = var4;
 		this.heightMap = new int[var1 * var3];
+		Arrays.fill(this.heightMap, this.depth);
 		this.calcLightDepths(0, 0, var1, var3);
 
 		for(var1 = 0; var1 < this.levelListeners.size(); ++var1) {
@@ -270,18 +274,19 @@ public class Level implements Serializable {
 		return var4 == null ? false : var4.isSolid();
 	}
 
-	public void tick() {
-		++this.tickCount;
-
-		int var1;
-		for(var1 = 0; var1 < this.entities.size(); ++var1) {
+	public void tickEntities() {
+		for(int var1 = 0; var1 < this.entities.size(); ++var1) {
 			((Entity)this.entities.get(var1)).tick();
 			if(((Entity)this.entities.get(var1)).removed) {
 				this.entities.remove(var1--);
 			}
 		}
 
-		var1 = 1;
+	}
+
+	public void tick() {
+		++this.tickCount;
+		int var1 = 1;
 
 		int var2;
 		for(var2 = 1; 1 << var1 < this.width; ++var1) {
@@ -301,7 +306,10 @@ public class Level implements Serializable {
 
 			for(var7 = 0; var7 < var6; ++var7) {
 				Coord var8 = (Coord)this.tickList.remove(0);
-				if(this.isInLevelBounds(var8.x, var8.y, var8.z)) {
+				if(var8.scheduledTime > 0) {
+					--var8.scheduledTime;
+					this.tickList.add(var8);
+				} else if(this.isInLevelBounds(var8.x, var8.y, var8.z)) {
 					byte var9 = this.blocks[(var8.y * this.height + var8.z) * this.width + var8.x];
 					if(var9 == var8.id && var9 > 0) {
 						Tile.tiles[var9].tick(this, var8.x, var8.y, var8.z, this.random);
@@ -387,7 +395,7 @@ public class Level implements Serializable {
 			for(var2 = var4; var2 < var5; ++var2) {
 				for(int var8 = var6; var8 < var7; ++var8) {
 					Tile var9 = Tile.tiles[this.getTile(var10, var2, var8)];
-					if(var9 != null && var9.getLiquidType() > 0) {
+					if(var9 != null && var9.getLiquidType() != Liquid.none) {
 						return true;
 					}
 				}
@@ -397,7 +405,7 @@ public class Level implements Serializable {
 		return false;
 	}
 
-	public boolean containsLiquid(AABB var1, int var2) {
+	public boolean containsLiquid(AABB var1, Liquid var2) {
 		int var3 = (int)var1.x0;
 		int var4 = (int)var1.x1 + 1;
 		int var5 = (int)var1.y0;
@@ -455,7 +463,13 @@ public class Level implements Serializable {
 	}
 
 	public void addToTickNextTick(int var1, int var2, int var3, int var4) {
-		this.tickList.add(new Coord(var1, var2, var3, var4));
+		Coord var5 = new Coord(var1, var2, var3, var4);
+		if(var4 > 0) {
+			var3 = Tile.tiles[var4].getTickDelay();
+			var5.scheduledTime = var3;
+		}
+
+		this.tickList.add(var5);
 	}
 
 	public boolean isFree(AABB var1) {
@@ -479,7 +493,7 @@ public class Level implements Serializable {
 
 	public int getHighestTile(int var1, int var2) {
 		int var3;
-		for(var3 = this.depth; (this.getTile(var1, var3 - 1, var2) == 0 || Tile.tiles[this.getTile(var1, var3 - 1, var2)].getLiquidType() != 0) && var3 > 0; --var3) {
+		for(var3 = this.depth; (this.getTile(var1, var3 - 1, var2) == 0 || Tile.tiles[this.getTile(var1, var3 - 1, var2)].getLiquidType() != Liquid.none) && var3 > 0; --var3) {
 		}
 
 		return var3;
@@ -493,7 +507,7 @@ public class Level implements Serializable {
 	}
 
 	public float getBrightness(int var1, int var2, int var3) {
-		return this.isLit(var1, var2, var3) ? 1.0F : 0.5F;
+		return this.isLit(var1, var2, var3) ? 1.0F : 0.6F;
 	}
 
 	public float getCaveness(float var1, float var2, float var3, float var4) {
@@ -558,18 +572,18 @@ public class Level implements Serializable {
 		float var9 = 0.0F;
 		float var10 = 0.0F;
 
-		for(int var11 = 0; var11 <= 10; ++var11) {
-			float var12 = ((float)var11 / (float)10 - 0.5F) * 2.0F;
+		for(int var11 = 0; var11 <= 200; ++var11) {
+			float var12 = ((float)var11 / (float)200 - 0.5F) * 2.0F;
 
-			for(int var13 = 0; var13 <= 10; ++var13) {
-				float var14 = ((float)var13 / (float)10 - 0.5F) * var8;
+			for(int var13 = 0; var13 <= 200; ++var13) {
+				float var14 = ((float)var13 / (float)200 - 0.5F) * var8;
 				float var16 = var4 * var14 + var5;
 				var14 = var4 - var5 * var14;
 				float var17 = var2 * var12 + var3 * var14;
 				var16 = var16;
 				var14 = var2 * var14 - var3 * var12;
 
-				for(int var15 = 0; var15 < 20; ++var15) {
+				for(int var15 = 0; var15 < 10; ++var15) {
 					float var18 = var6 + var17 * (float)var15 * 0.8F;
 					float var19 = var7 + var16 * (float)var15 * 0.8F;
 					float var20 = var21 + var14 * (float)var15 * 0.8F;
@@ -711,7 +725,7 @@ public class Level implements Serializable {
 					}
 
 					int var19 = this.getTile(var6, var7, var8);
-					if(var19 > 0 && Tile.tiles[var19].getLiquidType() == 0) {
+					if(var19 > 0 && Tile.tiles[var19].getLiquidType() == Liquid.none) {
 						return new HitResult(0, var6, var7, var8, var20);
 					}
 				}

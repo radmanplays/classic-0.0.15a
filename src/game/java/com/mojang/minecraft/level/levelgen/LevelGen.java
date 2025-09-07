@@ -236,17 +236,17 @@ public final class LevelGen {
 				int var11 = var1[var7 + var8 * var2];
 				int var12 = (var11 * this.height + var8) * this.width + var7;
 				int var13 = this.blocks[((var11 + 1) * this.height + var8) * this.width + var7] & 255;
+				if((var13 == Tile.water.id || var13 == Tile.calmWater.id) && var11 <= var4 / 2 - 1 && var10) {
+					this.blocks[var12] = (byte)Tile.gravel.id;
+				}
+
 				if(var13 == 0) {
-					var13 = Tile.grass.id;
-					if(var11 <= var4 / 2 - 1 && var10) {
-						var13 = Tile.gravel.id;
-					}
-
+					int var14 = Tile.grass.id;
 					if(var11 <= var4 / 2 - 1 && var9) {
-						var13 = Tile.sand.id;
+						var14 = Tile.sand.id;
 					}
 
-					this.blocks[var12] = (byte)var13;
+					this.blocks[var12] = (byte)var14;
 				}
 			}
 		}
@@ -271,7 +271,7 @@ public final class LevelGen {
 					var9 += this.random.nextInt(6) - this.random.nextInt(6);
 					if(var8 >= 0 && var9 >= 0 && var8 < this.width && var9 < this.height) {
 						int var11 = var1[var8 + var9 * var2] + 1;
-						int var12 = this.random.nextInt(2) + 4;
+						int var12 = this.random.nextInt(3) + 4;
 						boolean var13 = true;
 
 						int var14;
@@ -300,20 +300,21 @@ public final class LevelGen {
 
 						if(var13) {
 							var14 = (var11 * this.height + var9) * this.width + var8;
-							int var21 = this.blocks[((var11 - 1) * this.height + var9) * this.width + var8] & 255;
-							if(var21 == Tile.grass.id && var11 < this.depth - var12 - 1) {
+							int var22 = this.blocks[((var11 - 1) * this.height + var9) * this.width + var8] & 255;
+							if(var22 == Tile.grass.id && var11 < this.depth - var12 - 1) {
 								this.blocks[var14 - 1 * this.width * this.height] = (byte)Tile.dirt.id;
 
-								for(var16 = var11 - 2 + var12; var16 <= var11 + var12; ++var16) {
+								for(var16 = var11 - 3 + var12; var16 <= var11 + var12; ++var16) {
 									var17 = var16 - (var11 + var12);
+									var18 = 1 - var17 / 2;
 
-									for(int var20 = var8 - 1; var20 <= var8 + 1; ++var20) {
-										var21 = var20 - var8;
+									for(int var21 = var8 - var18; var21 <= var8 + var18; ++var21) {
+										var22 = var21 - var8;
 
-										for(var18 = var9 - 1; var18 <= var9 + 1; ++var18) {
-											int var19 = var18 - var9;
-											if(var17 != 0 || Math.abs(var21) != 1 || Math.abs(var19) != 1) {
-												this.blocks[(var16 * this.height + var18) * this.width + var20] = (byte)Tile.leaf.id;
+										for(int var19 = var9 - var18; var19 <= var9 + var18; ++var19) {
+											int var20 = var19 - var9;
+											if(Math.abs(var22) != var18 || Math.abs(var20) != var18 || this.random.nextInt(2) != 0 && var17 != 0) {
+												this.blocks[(var16 * this.height + var19) * this.width + var21] = (byte)Tile.leaf.id;
 											}
 										}
 									}

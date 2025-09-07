@@ -63,8 +63,9 @@ public class Player extends Entity {
 			this.zd *= 0.91F;
 			this.yd = (float)((double)this.yd - 0.08D);
 			if(this.onGround) {
-				this.xd *= 0.6F;
-				this.zd *= 0.6F;
+				var3 = 0.6F;
+				this.xd *= var3;
+				this.zd *= var3;
 			}
 
 		}

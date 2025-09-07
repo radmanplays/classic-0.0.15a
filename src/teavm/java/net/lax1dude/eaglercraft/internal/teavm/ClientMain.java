@@ -212,6 +212,29 @@ public class ClientMain {
 
 			try {
 				Minecraft minecraft = new Minecraft(854, 480, false);
+				String username = eaglercraftOpts.getString("username");
+				if (username != null && !username.isEmpty()) {
+					minecraft.user = new User(username, "");
+					systemOut.println("Using username: " + username);
+				}
+
+				String server = eaglercraftOpts.getString("server");
+				if (server != null && !server.isEmpty()) {
+					String[] parts = server.split(":");
+					if (parts.length == 2) {
+						String host = parts[0];
+						int port;
+						try {
+							port = Integer.parseInt(parts[1]);
+							minecraft.setServer(host, port);
+							systemOut.println("Connecting to server " + host + ":" + port);
+						} catch (NumberFormatException e) {
+							systemErr.println("Invalid port in eaglercraftXOpts.server: " + parts[1]);
+						}
+					} else {
+						systemErr.println("Invalid server format in eaglercraftXOpts.server, expected IP:PORT");
+					}
+				}
 				(new Thread(minecraft)).run();
 			}catch(ContextLostError ex) {
 				systemErr.println("ClientMain: [ERROR] webgl context lost!");

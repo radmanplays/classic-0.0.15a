@@ -1,20 +1,21 @@
 package com.mojang.minecraft.level.tile;
 
 import com.mojang.minecraft.level.Level;
+import com.mojang.minecraft.level.liquid.Liquid;
 import com.mojang.minecraft.phys.AABB;
 import com.mojang.minecraft.renderer.Tesselator;
 import java.util.Random;
 
 public class LiquidTile extends Tile {
-	protected int liquidType;
+	protected Liquid liquid;
 	protected int calmTileId;
 	protected int tileId;
 
-	protected LiquidTile(int var1, int var2) {
+	protected LiquidTile(int var1, Liquid var2) {
 		super(var1);
-		this.liquidType = var2;
+		this.liquid = var2;
 		this.tex = 14;
-		if(var2 == 2) {
+		if(var2 == Liquid.lava) {
 			this.tex = 30;
 		}
 
@@ -23,6 +24,10 @@ public class LiquidTile extends Tile {
 		float var3 = 0.1F;
 		this.setShape(0.0F, 0.0F - var3, 0.0F, 1.0F, 1.0F - var3, 1.0F);
 		this.setTicking(true);
+		if(var2 == Liquid.lava) {
+			this.setTickSpeed(16);
+		}
+
 	}
 
 	public final void onBlockAdded(Level var1, int var2, int var3, int var4) {
@@ -49,10 +54,10 @@ public class LiquidTile extends Tile {
 			if(var6) {
 				var9 = true;
 			}
-		} while(var6 && var8.liquidType != 2);
+		} while(var6 && var8.liquid != Liquid.lava);
 
 		++var3;
-		if(var8.liquidType == 1 || !var9) {
+		if(var8.liquid == Liquid.water || !var9) {
 			var9 |= var8.checkWater(var1, var2 - 1, var3, var4);
 			var9 |= var8.checkWater(var1, var2 + 1, var3, var4);
 			var9 |= var8.checkWater(var1, var2, var3, var4 - 1);
@@ -79,13 +84,17 @@ public class LiquidTile extends Tile {
 		return false;
 	}
 
+	protected final float getBrightness(Level var1, int var2, int var3, int var4) {
+		return this.liquid == Liquid.lava ? 100.0F : var1.getBrightness(var2, var3, var4);
+	}
+
 	protected final boolean shouldRenderFace(Level var1, int var2, int var3, int var4, int var5, int var6) {
 		if(var2 >= 0 && var3 >= 0 && var4 >= 0 && var2 < var1.width && var4 < var1.height) {
-			if(var5 != 1 && this.liquidType == 1) {
+			if(var5 != 1 && this.liquid == Liquid.water) {
 				return false;
 			} else {
 				var5 = var1.getTile(var2, var3, var4);
-				return var5 != this.tileId && var5 != this.calmTileId ? super.shouldRenderFace(var1, var2, var3, var4, -1, var6) : false;
+				return var5 != this.tileId && var5 != this.calmTileId ? (var6 != 1 || var1.getTile(var2 - 1, var3, var4) != 0 && var1.getTile(var2 + 1, var3, var4) != 0 && var1.getTile(var2, var3, var4 - 1) != 0 && var1.getTile(var2, var3, var4 + 1) != 0 ? super.shouldRenderFace(var1, var2, var3, var4, -1, var6) : true) : false;
 			}
 		} else {
 			return false;
@@ -113,19 +122,23 @@ public class LiquidTile extends Tile {
 		return false;
 	}
 
-	public final int getLiquidType() {
-		return this.liquidType;
+	public final Liquid getLiquidType() {
+		return this.liquid;
 	}
 
 	public void neighborChanged(Level var1, int var2, int var3, int var4, int var5) {
-		if(this.liquidType == 1 && (var5 == Tile.lava.id || var5 == Tile.calmLava.id)) {
-			var1.setTileNoUpdate(var2, var3, var4, Tile.rock.id);
-		}
-
-		if(this.liquidType == 2 && (var5 == Tile.water.id || var5 == Tile.calmWater.id)) {
-			var1.setTileNoUpdate(var2, var3, var4, Tile.rock.id);
+		if(var5 != 0) {
+			Liquid var6 = Tile.tiles[var5].getLiquidType();
+			if(this.liquid == Liquid.water && var6 == Liquid.lava || var6 == Liquid.water && this.liquid == Liquid.lava) {
+				var1.setTile(var2, var3, var4, Tile.rock.id);
+				return;
+			}
 		}
 
 		var1.addToTickNextTick(var2, var3, var4, var5);
+	}
+
+	public final int getTickDelay() {
+		return this.liquid == Liquid.lava ? 5 : 0;
 	}
 }

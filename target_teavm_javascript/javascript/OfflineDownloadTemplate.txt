@@ -30,7 +30,7 @@ Compile it yourself here: https://gitlab.com/lax1dude/eaglercraftx-1.8/
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
 <meta name="description" content="EaglercraftX 1.8 Offline" />
 <meta name="keywords" content="eaglercraft, eaglercraftx, minecraft, 1.8, 1.8.8" />
-<title>Classic 0.0.14a_8</title>
+<title>Classic 0.0.15a</title>
 <meta property="og:locale" content="en-US" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="EaglercraftX 1.8 Offline" />
@@ -63,6 +63,13 @@ ${classes_js}
 "use strict";
 (function(){
 	window.eaglercraftXOpts.assetsURI = ${assets_epk};
+
+	if (!window.eaglercraftXOpts.server) {
+    	    window.eaglercraftXOpts.server = prompt("Enter server (IP:PORT)(leave empty if you want to play singleplayer)", "");
+	}
+	if (!window.eaglercraftXOpts.username) {
+            window.eaglercraftXOpts.username = prompt("Enter username", "");
+	}
 
 	var launchInterval = -1;
 	var launchCounter = 1;

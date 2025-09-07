@@ -49,7 +49,7 @@ import net.lax1dude.eaglercraft.internal.vfs2.VFSIterator2;
 public class IndexedDBFilesystem implements IEaglerFilesystem {
 
 	public static IEaglerFilesystem createFilesystem(String dbName) {
-		String filesystemDB = "_me_radmanplays_eaglercraft_internal_PlatformFilesystem_0_0_14_a_08_" + dbName;
+		String filesystemDB = "_me_radmanplays_eaglercraft_internal_PlatformFilesystem_0_0_15_a_" + dbName;
 		System.out.println(filesystemDB);
 		DatabaseOpen dbOpen = AsyncHandlers.openDB(filesystemDB);
 		

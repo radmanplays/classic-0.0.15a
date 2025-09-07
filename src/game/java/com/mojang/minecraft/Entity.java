@@ -1,6 +1,7 @@
 package com.mojang.minecraft;
 
 import com.mojang.minecraft.level.Level;
+import com.mojang.minecraft.level.liquid.Liquid;
 import com.mojang.minecraft.phys.AABB;
 import com.mojang.minecraft.renderer.Textures;
 import java.io.Serializable;
@@ -36,19 +37,21 @@ public class Entity implements Serializable {
 	}
 
 	protected void resetPos() {
-		float var1 = (float)this.level.xSpawn + 0.5F;
-		float var2 = (float)this.level.ySpawn;
+		if(this.level != null) {
+			float var1 = (float)this.level.xSpawn + 0.5F;
+			float var2 = (float)this.level.ySpawn;
 
-		for(float var3 = (float)this.level.zSpawn + 0.5F; var2 > 0.0F; ++var2) {
-			this.setPos(var1, var2, var3);
-			if(this.level.getCubes(this.bb).size() == 0) {
-				break;
+			for(float var3 = (float)this.level.zSpawn + 0.5F; var2 > 0.0F; ++var2) {
+				this.setPos(var1, var2, var3);
+				if(this.level.getCubes(this.bb).size() == 0) {
+					break;
+				}
 			}
-		}
 
-		this.xd = this.yd = this.zd = 0.0F;
-		this.yRot = this.level.rotSpawn;
-		this.xRot = 0.0F;
+			this.xd = this.yd = this.zd = 0.0F;
+			this.yRot = this.level.rotSpawn;
+			this.xRot = 0.0F;
+		}
 	}
 
 	public void remove() {
@@ -157,11 +160,11 @@ public class Entity implements Serializable {
 	}
 
 	public boolean isInWater() {
-		return this.level.containsLiquid(this.bb.grow(0.0F, -0.4F, 0.0F), 1);
+		return this.level.containsLiquid(this.bb.grow(0.0F, -0.4F, 0.0F), Liquid.water);
 	}
 
 	public boolean isInLava() {
-		return this.level.containsLiquid(this.bb, 2);
+		return this.level.containsLiquid(this.bb.grow(0.0F, -0.4F, 0.0F), Liquid.lava);
 	}
 
 	public void moveRelative(float var1, float var2, float var3) {
@@ -200,5 +203,14 @@ public class Entity implements Serializable {
 
 	public void setLevel(Level var1) {
 		this.level = var1;
+	}
+
+	public void moveTo(float var1, float var2, float var3, float var4, float var5) {
+		this.xo = this.x = var1;
+		this.yo = this.y = var2;
+		this.zo = this.z = var3;
+		this.xRot = var4;
+		this.yRot = var5;
+		this.setPos(var1, var2, var3);
 	}
 }
