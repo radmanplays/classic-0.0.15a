@@ -26,6 +26,9 @@ import net.lax1dude.eaglercraft.internal.ContextLostError;
 import net.lax1dude.eaglercraft.internal.PlatformApplication;
 import net.lax1dude.eaglercraft.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.internal.wasm_gc_teavm.opts.JSEaglercraftXOptsRoot;
+import net.lax1dude.eaglercraft.socket.AddressResolver;
+import net.lax1dude.eaglercraft.socket.AddressResolver.ServerInfo;
+
 import com.mojang.minecraft.Minecraft;
 import com.mojang.minecraft.User;
 import net.lax1dude.eaglercraft.EagRuntime;
@@ -97,20 +100,9 @@ public class ClientMain {
 				}
 
 				if (server != null && !server.isEmpty()) {
-					String[] parts = server.split(":");
-					if (parts.length == 2) {
-						String host = parts[0];
-						int port;
-						try {
-							port = Integer.parseInt(parts[1]);
-							minecraft.setServer(host, port);
-							systemOut.println("Connecting to server " + host + ":" + port);
-						} catch (NumberFormatException e) {
-							systemErr.println("Invalid port in eaglercraftXOpts.server: " + parts[1]);
-						}
-					} else {
-						systemErr.println("Invalid server format in eaglercraftXOpts.server, expected IP:PORT");
-					}
+					ServerInfo serverInfo = AddressResolver.resolveURI(server);
+					minecraft.setServer(serverInfo.host, serverInfo.port);
+					systemOut.println("Connecting to server " + serverInfo.ip);
 				}
 
 				(new Thread(minecraft)).run();
