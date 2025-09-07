@@ -24,6 +24,12 @@ public abstract class JSEaglercraftXOptsRoot implements JSObject {
 	@JSBody(script = "return (typeof this.container === \"string\") ? this.container : null;")
 	public native String getContainer();
 
+	@JSProperty("username")
+    public native String getUsername();
+
+    @JSProperty("server")
+    public native String getServer();
+
 	@JSBody(script = "return (typeof this.assetsURI === \"string\") ? this.assetsURI : null;")
 	public native String getAssetsURI();
 

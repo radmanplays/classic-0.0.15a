@@ -21,6 +21,11 @@ import org.teavm.jso.JSObject;
 import org.teavm.jso.core.JSArrayReader;
 
 public interface JSEaglercraftXOptsRoot extends JSObject {
+	@JSProperty("username")
+    public native String getUsername();
+
+    @JSProperty("server")
+    public native String getServer();
 
 	@JSBody(params = { "def" }, script = "return (typeof this.lang === \"string\") ? this.lang : def;")
 	String getLang(String defaultValue);

@@ -89,13 +89,13 @@ public class ClientMain {
 				JSEaglercraftXOptsRoot eaglercraftOpts = (JSEaglercraftXOptsRoot)opts;
 				Minecraft minecraft = new Minecraft(854, 480, false);
 
-				String username = eaglercraftOpts.getString("username");
+				String username = eaglercraftOpts.getUsername();
 				if (username != null && !username.isEmpty()) {
 					minecraft.user = new User(username, "");
 					systemOut.println("Using username: " + username);
 				}
 
-				String server = eaglercraftOpts.getString("server");
+				String server = eaglercraftOpts.getServer();
 				if (server != null && !server.isEmpty()) {
 					String[] parts = server.split(":");
 					if (parts.length == 2) {
